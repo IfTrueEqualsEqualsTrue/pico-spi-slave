@@ -1,0 +1,37 @@
+.program spi_slave
+
+.wrap_target
+
+wait 0 pin 0       ; Wait for CS LOW
+set y, 7           ; Prepare 8-bit counter
+
+bitloop:
+    out pins, 1          ; Output MISO bit
+    wait 1 pin 1         ; Wait for rising CLK
+    wait 0 pin 1         ; Wait for falling CLK
+    jmp y-- bitloop
+
+jmp 0                ; Loop back to wait for CS
+
+.wrap
+
+% c-sdk {
+
+static inline void spi_slave_program_init(PIO pio, uint sm, uint offset, uint cs_pin, uint sck_pin, uint miso_pin) {
+    pio_gpio_init(pio, cs_pin);
+    pio_gpio_init(pio, sck_pin);
+    pio_gpio_init(pio, miso_pin);
+
+    pio_sm_set_consecutive_pindirs(pio, sm, cs_pin, 2, false);   // CS and SCK inputs
+    pio_sm_set_consecutive_pindirs(pio, sm, miso_pin, 1, true);  // MISO output
+
+    pio_sm_config c = spi_slave_program_get_default_config(offset);
+
+    sm_config_set_in_pins(&c, cs_pin);
+    sm_config_set_out_pins(&c, miso_pin, 1);
+    sm_config_set_out_shift(&c, false, true, 8);  // MSB-first
+
+    pio_sm_init(pio, sm, offset, &c);
+    pio_sm_set_enabled(pio, sm, true);
+}
+%}
