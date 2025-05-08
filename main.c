@@ -24,6 +24,6 @@ int main() {
             tight_loop_contents();
 
         pio_sm_put_blocking(pio, sm, (uint32_t)(counter++) << 24);
-        printf("Sent to master: 0x%02X\n", counter);
+        printf("Pushed to TX FIFO: 0x%02X\n", counter);
     }
 }

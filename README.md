@@ -35,8 +35,8 @@ Flash the `.uf2` to the Pico. The SPI slave will start listening both CS and SCK
 
 ```
 PIO SPI Slave starting...
-Sent to master: 0x00
-Sent to master: 0x01
+Pushed to TX FIFO: 0x00
+Pushed to TX FIFO: 0x01
 ...
 ```
 
